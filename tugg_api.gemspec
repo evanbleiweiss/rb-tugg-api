@@ -8,8 +8,8 @@ Gem::Specification.new do |spec|
   spec.version       = TuggApi::VERSION
   spec.authors       = ["Luke Wendling"]
   spec.email         = ["luke@lukewendling.com"]
-  spec.description   = %q{Interact with the Tugg API}
-  spec.summary       = %q{Interact with the Tugg API}
+  spec.description   = %q{Interact with the Tugg API via Ruby's EventMachine}
+  spec.summary       = %q{Access the Tugg API}
   spec.homepage      = ""
   spec.license       = "MIT"
 
