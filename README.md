@@ -1,6 +1,6 @@
-# TuggApi
+# Tugg Api
 
-> Interact with the Tugg API (www.tugg.com/api)
+> Interact with the Tugg API (www.tugg.com/api) via Ruby's EventMachine
 
 ## Installation
 
@@ -18,8 +18,10 @@ Or install it yourself as:
 
 ## Usage
 
+```ruby
 client = TuggApi::Client.new(API_KEY)
 client.get(api_type: 'titles', id: 1451)
+```
 
 ## Contributing
 
