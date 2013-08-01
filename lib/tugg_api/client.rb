@@ -9,6 +9,10 @@ module TuggApi
       @api_version = api_version
     end
 
+    def use_localhost?
+      ENV['USE_LOCAL'].present?
+    end
+
     # expects:
       # api_type: 'titles' or 'events'
       # id of event or title
@@ -32,7 +36,12 @@ module TuggApi
           path: "api/#{api_type}/#{id}.#{format}",
           head: {'TUGG-API-KEY' => @api_key, 'TUGG-API-VERSION' => @api_version}
         }
-        http = EventMachine::HttpRequest.new('https://www.tugg.com/', conn_options).get req_options
+
+        if use_localhost?
+          http = EventMachine::HttpRequest.new('http://localhost:3000/', conn_options).get req_options
+        else  
+          http = EventMachine::HttpRequest.new('https://www.tugg.com/', conn_options).get req_options
+        end
 
         http.errback do
           response = http.response
