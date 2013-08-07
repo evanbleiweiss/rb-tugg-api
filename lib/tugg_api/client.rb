@@ -7,12 +7,9 @@ module TuggApi
     def initialize(api_key, api_version = 1)
       @api_key = api_key
       @api_version = api_version
+      p 'using local' if use_localhost?
     end
-
-    def use_localhost?
-      ENV['USE_LOCAL'].present?
-    end
-
+   
     # expects:
       # api_type: 'titles' or 'events'
       # id of event or title
@@ -37,11 +34,7 @@ module TuggApi
           head: {'TUGG-API-KEY' => @api_key, 'TUGG-API-VERSION' => @api_version}
         }
 
-        if use_localhost?
-          http = EventMachine::HttpRequest.new('http://localhost:3000/', conn_options).get req_options
-        else  
-          http = EventMachine::HttpRequest.new('https://www.tugg.com/', conn_options).get req_options
-        end
+        http = EventMachine::HttpRequest.new(build_url, conn_options).get req_options
 
         http.errback do
           response = http.response
@@ -60,6 +53,48 @@ module TuggApi
       end
 
       return response
+    end
+ 
+    #looking for options passed to rails server/console
+    #requires server name to be specified, e.g. '$ rails s webrick tugg-local' bc of order specific argument passing in rails
+    def use_localhost?
+      ARGV.include?('tugg-local')
+    end
+    
+    def port?
+      get_port if ARGV.include?('tugg-port')
+    end
+    
+    #usage: '$ rails c development tugg-local tugg-port 3001'
+    def get_port
+      pos = ARGV.index('tugg-port').next
+      ARGV[pos]
+    end
+
+    #domain builder utilities
+    def build_url
+      if use_localhost?
+        http = protocol('http')
+        domain = hostname('localhost')
+        port = api_port(port? || 3000) 
+      else
+        http = protocol
+        domain = hostname
+        port = api_port
+      end
+      url = "#{http}://#{domain}:#{port}/"
+    end
+    
+    def api_port(port = 443)
+      port
+    end
+
+    def hostname(domain = 'www.tugg.com')
+      domain
+    end
+
+    def protocol(protocol= 'https')
+      protocol
     end
 
   end
