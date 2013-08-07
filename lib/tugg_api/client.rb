@@ -57,25 +57,26 @@ module TuggApi
  
     #looking for options passed to rails server/console
     #requires server name to be specified, e.g. '$ rails s webrick tugg-local' bc of order specific argument passing in rails
+    #assumes 'http://localhost:3000' unless specified via tugg-[domain||port] options
     def use_localhost?
       ARGV.include?('tugg-local')
     end
     
+    #usage: '$ rails c development tugg-local tugg-port 3001'
     def port?
       get_port if ARGV.include?('tugg-port')
     end
     
-    #usage: '$ rails c development tugg-local tugg-port 3001'
-    def get_port
-      pos = ARGV.index('tugg-port').next
-      ARGV[pos]
+    #usage: '$ rails c development tugg-local tugg-domain mybox.dev'
+    def domain?
+      get_domain if ARGV.include?('tugg-domain')
     end
 
     #domain builder utilities
     def build_url
       if use_localhost?
         http = protocol('http')
-        domain = hostname('localhost')
+        domain = hostname(domain? || 'localhost')
         port = api_port(port? || 3000) 
       else
         http = protocol
@@ -95,6 +96,18 @@ module TuggApi
 
     def protocol(protocol= 'https')
       protocol
+    end
+
+    private
+
+    def get_port
+      pos = ARGV.index('tugg-port').next
+      ARGV[pos]
+    end
+    
+    def get_domain
+      pos = ARGV.index('tugg-domain').next
+      ARGV[pos]
     end
 
   end
